@@ -1,5 +1,5 @@
 ---
-- hosts: web
+- hosts: lamp
   tasks:
     - name: debconf for pma
       debconf: name=phpmyadmin question='phpmyadmin/dbconfig-install' value='true' vtype='boolean'
