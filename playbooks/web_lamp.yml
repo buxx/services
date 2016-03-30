@@ -1,21 +1,6 @@
 ---
 - hosts: lamp
   tasks:
-    - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/dbconfig-install' value='true' vtype='boolean'
-
-    - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/app-password-confirm' value='PASSWORD' vtype='password'
-
-    - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/mysql/admin-pass' value='PASSWORD_PMA' vtype='password'
-
-    - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/mysql/app-pass' value='PASSWORD_PMA' vtype='password'
-
-    - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/reconfigure-webserver' value='' vtype='multiselect'
-
     - name: packages installed
       apt: name={{ item }} state=present update_cache=yes cache_valid_time=86400
       with_items:
@@ -41,8 +26,20 @@
       - ::1
       - localhost
 
-    - name: install phpmyadmin
-      apt: name=phpmyadmin state=present update_cache=yes cache_valid_time=86400
+    - name: debconf for pma
+      debconf: name=phpmyadmin question='phpmyadmin/dbconfig-install' value='true' vtype='boolean'
+
+    - name: debconf for pma
+      debconf: name=phpmyadmin question='phpmyadmin/app-password-confirm' value='PASSWORD' vtype='password'
+
+    - name: debconf for pma
+      debconf: name=phpmyadmin question='phpmyadmin/mysql/admin-pass' value='PASSWORD_PMA' vtype='password'
+
+    - name: debconf for pma
+      debconf: name=phpmyadmin question='phpmyadmin/mysql/app-pass' value='PASSWORD_PMA' vtype='password'
+
+    - name: debconf for pma
+      debconf: name=phpmyadmin question='phpmyadmin/reconfigure-webserver' value='' vtype='multiselect'
 
     - name: services up
       service: name={{ item }} state=running enabled=yes
