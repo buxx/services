@@ -2,7 +2,7 @@
 - hosts: lamp
   tasks:
     - name: packages installed
-      apt: name={{ item }} state=present update_cache=yes cache_valid_time=86400
+      apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
       with_items:
         - mysql-server
         - apache2
@@ -10,6 +10,12 @@
         - python-mysqldb
         - python-passlib
         - phpmyadmin
+
+    - name: services up
+      service: name={{ item }} state=running enabled=yes
+      with_items:
+        - apache2
+        - mysql
 
     - name: mysql root privileges
       mysql_user:
@@ -41,17 +47,14 @@
     - name: debconf for pma
       debconf: name=phpmyadmin question='phpmyadmin/reconfigure-webserver' value='' vtype='multiselect'
 
-    - name: services up
-      service: name={{ item }} state=running enabled=yes
-      with_items:
-        - apache2
-        - mysql
-
     - name: Hello World PHP script
       copy: src=web/index.php dest=/var/www/index.php mode=0664
 
     - name: pma virtual host
-      copy: src=web/phpmyadmin.conf dest=/etc/apache2/conf.d/phpmyadmin.conf mode=0664
+      copy: src=web/phpmyadmin.conf dest=/etc/apache2/sites-available/phpmyadmin.conf mode=0664
+
+    - name: pma vhost enabled
+      file: src=/etc/apache2/sites-available/phpmyadmin.conf dest=/etc/apache2/sites-enabled/phpmyadmin.conf state=link
 
     - name: apache reloaded
       service: name=apache2 state=reloaded
