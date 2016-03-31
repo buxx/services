@@ -1,6 +1,7 @@
 ---
 - hosts: lamp
   tasks:
+    - include_vars: ../vars.yml
     - name: packages installed
       apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
       with_items:
@@ -21,9 +22,9 @@
       mysql_user:
         name: root
         host: "{{ item }}"
-        password: "PASSWORD"
+        password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
         login_user: root
-        login_password: "PASSWORD"
+        login_password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
         check_implicit_admin: yes
         priv: "*.*:ALL,GRANT"
       with_items:
@@ -36,13 +37,13 @@
       debconf: name=phpmyadmin question='phpmyadmin/dbconfig-install' value='true' vtype='boolean'
 
     - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/app-password-confirm' value='PASSWORD' vtype='password'
+      debconf: name=phpmyadmin question='phpmyadmin/app-password-confirm' value='{{ PMA_PASSWORD }}' vtype='password'
 
     - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/mysql/admin-pass' value='PASSWORD_PMA' vtype='password'
+      debconf: name=phpmyadmin question='phpmyadmin/mysql/admin-pass' value='{{ PMA_PASSWORD }}' vtype='password'
 
     - name: debconf for pma
-      debconf: name=phpmyadmin question='phpmyadmin/mysql/app-pass' value='PASSWORD_PMA' vtype='password'
+      debconf: name=phpmyadmin question='phpmyadmin/mysql/app-pass' value='{{ PMA_PASSWORD }}' vtype='password'
 
     - name: debconf for pma
       debconf: name=phpmyadmin question='phpmyadmin/reconfigure-webserver' value='' vtype='multiselect'
@@ -60,4 +61,4 @@
       service: name=apache2 state=reloaded
 
     - name: secure pma http access
-      htpasswd: path=/etc/htaccess/pma name=root password=PASSWORD owner=root group=www-data mode=0640 state=present
+      htpasswd: path=/etc/htaccess/pma name=root password={{ PMA_HTACCESS_PASSWORD }} owner={{ PMA_HTACCESS_LOGIN }} group=www-data mode=0640 state=present
