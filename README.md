@@ -1,5 +1,13 @@
 # Bux ansible services
 
+## Requirements
+
+First install python dependencies (in virtual env)
+
+```
+pip install -r requirements.txt
+```
+
 ## Example with docker
 
 Start a fresh debian container
