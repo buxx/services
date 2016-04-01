@@ -12,4 +12,4 @@ with open('hosts', 'w') as f:
     f.write(hosts_content)
     f.write("\n")
 
-print('Done')
+print(hosts_content)
