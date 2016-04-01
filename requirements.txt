@@ -1,2 +1,3 @@
 ansible
 markupsafe
+jinja2
