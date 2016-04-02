@@ -21,18 +21,17 @@ action = %(action_)s
 enabled = true
 port	= ssh
 filter	= sshd
-logpath  = /var/log/auth.log
+# logpath  = /var/log/auth.log
 maxRetry = 3  
 findtime = 600  
 bantime  = 600  
-port     = 22
 
 [ssh-ddos]
 
 enabled = true
 port    = ssh
 filter  = sshd-ddos
-logpath  = /var/log/auth.log
+# logpath  = /var/log/auth.log
 maxretry = 6
 
 {% if FAIL2BAN_APACHE is defined and FAIL2BAN_APACHE %}
