@@ -1,8 +1,14 @@
-# Bux ansible services
+# Bux ansible services (debian)
 
 ## Requirements
 
-First install python dependencies (in virtual env)
+First you need some debian packages
+
+```
+sudo apt-get install python python-dev build-essential
+```
+
+Then install python dependencies (in virtual env)
 
 ```
 pip install -r requirements.txt
