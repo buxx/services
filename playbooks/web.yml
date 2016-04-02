@@ -1,0 +1,5 @@
+---
+- hosts: web
+  tasks:
+    - include_vars: ../vars.yml
+    - include: ../tasks/web.yml

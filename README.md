@@ -18,12 +18,19 @@ pip install -r requirements.txt
 
 Start a fresh debian container
 ```
-docker run -d --name ansible_sandbox_1 buxx/debian_ansible_sandbox
+docker run --privileged -d --name ansible_sandbox_1 buxx/debian_ansible_sandbox
 ```
+
+*Note ``--privileged`` parameter to allow iptables working in container``
 
 Build hosts file with container ip (it will be a [lamp] and [web] server)
 ```
 python make_hosts.py $(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ansible_sandbox_1)
+```
+
+Ensure private key is correctly chmoded
+```
+chmod 700 docker/sandbox/debian/id_rsa_ansible
 ```
 
 Run playbook on it

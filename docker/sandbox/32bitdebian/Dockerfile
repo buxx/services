@@ -1,4 +1,4 @@
-FROM debian
+FROM 32bit/debian
 
 RUN export DEBIAN_FRONTEND=noninteractive && \
     apt-get update && apt-get install -y sudo libnet-ifconfig-wrapper-perl \

@@ -1,0 +1,61 @@
+- include_vars: ../vars.yml
+- name: packages installed
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - mysql-server
+    - apache2
+    - libapache2-mod-php5
+    - python-mysqldb
+    - python-passlib
+    - phpmyadmin
+
+- name: services up
+  service: name={{ item }} state=running enabled=yes
+  with_items:
+    - apache2
+    - mysql
+
+- name: mysql root privileges
+  mysql_user:
+    name: root
+    host: "{{ item }}"
+    password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
+    login_user: root
+    login_password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
+    check_implicit_admin: yes
+    priv: "*.*:ALL,GRANT"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost
+
+- name: debconf for pma
+  debconf: name=phpmyadmin question='phpmyadmin/dbconfig-install' value='true' vtype='boolean'
+
+- name: debconf for pma
+  debconf: name=phpmyadmin question='phpmyadmin/app-password-confirm' value='{{ PMA_PASSWORD }}' vtype='password'
+
+- name: debconf for pma
+  debconf: name=phpmyadmin question='phpmyadmin/mysql/admin-pass' value='{{ PMA_PASSWORD }}' vtype='password'
+
+- name: debconf for pma
+  debconf: name=phpmyadmin question='phpmyadmin/mysql/app-pass' value='{{ PMA_PASSWORD }}' vtype='password'
+
+- name: debconf for pma
+  debconf: name=phpmyadmin question='phpmyadmin/reconfigure-webserver' value='' vtype='multiselect'
+
+- name: Hello World PHP script
+  copy: src=../src/web/index.php dest=/var/www/index.php mode=0664
+
+- name: pma virtual host
+  copy: src=../src/web/phpmyadmin.conf dest=/etc/apache2/sites-available/phpmyadmin.conf mode=0664
+
+- name: pma vhost enabled
+  file: src=/etc/apache2/sites-available/phpmyadmin.conf dest=/etc/apache2/sites-enabled/phpmyadmin.conf state=link
+
+- name: apache reloaded
+  service: name=apache2 state=reloaded
+
+- name: secure pma http access
+  htpasswd: path=/etc/htaccess/pma name=root password={{ PMA_HTACCESS_PASSWORD }} owner={{ PMA_HTACCESS_LOGIN }} group=www-data mode=0640 state=present

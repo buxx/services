@@ -1,0 +1,160 @@
+[DEFAULT]
+
+ignoreip = 127.0.0.1 192.168.0.0/24
+bantime  = 600
+maxretry = 3
+# backend = polling
+backend = systemd
+destemail = sevajol.bastien@gmail.com
+banaction = iptables-multiport
+mta = sendmail
+protocol = tcp
+action_ = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s]
+action_mw = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s]
+              %(mta)s-whois[name=%(__name__)s, dest="%(destemail)s", protocol="%(protocol)s]
+action_mwl = %(banaction)s[name=%(__name__)s, port="%(port)s", protocol="%(protocol)s]
+               %(mta)s-whois-lines[name=%(__name__)s, dest="%(destemail)s", logpath=%(logpath)s] 
+action = %(action_)s
+
+[ssh]
+
+enabled = true
+port	= ssh
+filter	= sshd
+logpath  = /var/log/auth.log
+maxRetry = 3  
+findtime = 600  
+bantime  = 600  
+port     = 22
+
+[ssh-ddos]
+
+enabled = true
+port    = ssh
+filter  = sshd-ddos
+logpath  = /var/log/auth.log
+maxretry = 6
+
+{% if FAIL2BAN_APACHE is defined and FAIL2BAN_APACHE %}
+[apache]
+
+enabled = true
+port	= http,https
+filter	= apache-auth
+logpath = /var/log/apache*/*error.log
+maxretry = 6
+
+[apache-multiport]
+
+enabled   = true
+port	  = http,https
+filter	  = apache-auth
+logpath   = /var/log/apache*/*error.log
+maxretry  = 6
+
+[apache-noscript]
+  
+enabled   = true
+port	  = http,https
+filter	  = apache-auth
+logpath   = /var/log/apache*/*error.log
+maxretry  = 6
+
+[apache-noscript]
+
+enabled = true
+port    = http,https
+filter  = apache-noscript
+logpath = /var/log/apache*/*error.log
+maxretry = 6
+
+[apache-overflows]
+
+enabled = true
+port    = http,https
+filter  = apache-overflows
+logpath = /var/log/apache*/*error.log
+maxretry = 2
+{% endif %}
+
+{% if FAIL2BAN_VSFTPD is defined and FAIL2BAN_VSFTPD %}
+[vsftpd]
+
+enabled  = true
+port	 = ftp,ftp-data,ftps,ftps-data
+filter   = vsftpd
+logpath  = /var/log/vsftpd.log
+# or overwrite it in jails.local to be
+# logpath = /var/log/auth.log
+# if you want to rely on PAM failed login attempts
+# vsftpd's failregex should match both of those formats
+maxretry = 6
+{% endif %}
+
+{% if FAIL2BAN_PROFTPD is defined and FAIL2BAN_PROFTPD %}
+[proftpd]
+
+enabled  = false
+port	 = ftp,ftp-data,ftps,ftps-data
+filter   = proftpd
+logpath  = /var/log/proftpd/proftpd.log
+maxretry = 6
+{% endif %}
+
+{% if FAIL2BAN_WUFTPD is defined and FAIL2BAN_WUFTPD %}
+[wuftpd]
+
+enabled  = false
+port	 = ftp,ftp-data,ftps,ftps-data
+filter   = wuftpd
+logpath  = /var/log/auth.log
+maxretry = 6
+{% endif %}
+
+{% if FAIL2BAN_POSTFIX is defined and FAIL2BAN_POSTFIX %}
+[postfix]
+
+enabled  = true
+port	 = smtp,ssmtp
+filter   = postfix
+logpath  = /var/log/mail.log
+{% endif %}
+
+{% if FAIL2BAN_COURIERSMTP is defined and FAIL2BAN_COURIERSMTP %}
+[couriersmtp]
+
+enabled  = true
+port	 = smtp,ssmtp
+filter   = couriersmtp
+logpath  = /var/log/mail.log
+{% endif %}
+
+{% if FAIL2BAN_COURIERAUTH is defined and FAIL2BAN_COURIERAUTH %}
+[courierauth]
+
+enabled  = false
+port	 = smtp,ssmtp,imap2,imap3,imaps,pop3,pop3s
+filter   = courierlogin
+logpath  = /var/log/mail.log
+{% endif %}
+
+{% if FAIL2BAN_SASL is defined and FAIL2BAN_SASL %}
+[sasl]
+
+enabled  = false
+port	 = smtp,ssmtp,imap2,imap3,imaps,pop3,pop3s
+filter   = sasl
+# You might consider monitoring /var/log/warn.log instead
+# if you are running postfix. See http://bugs.debian.org/507990
+logpath  = /var/log/mail.log
+{% endif %}
+
+{% if FAIL2BAN_NAMED is defined and FAIL2BAN_NAMED %}
+[named-refused-tcp]
+
+enabled  = true
+port     = domain,953
+protocol = tcp
+filter   = named-refused
+logpath  = /var/log/named/security.log
+{% endif %}

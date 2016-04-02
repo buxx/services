@@ -1,0 +1,10 @@
+- name: packages installed
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - fail2ban
+
+- name: pma virtual host
+  template: src=../src/web/jail.local dest=/etc/fail2ban/jail.local mode=0664
+
+- name: fail2ban reloaded
+  service: name=fail2ban state=reloaded
