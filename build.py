@@ -45,6 +45,9 @@ class Project(Described):
                 return service
         raise Exception("Service %s not found" % service_name)
 
+    def get_vars(self):
+        return self.vars
+
 
 class Loader(object):
     @staticmethod
@@ -85,6 +88,7 @@ class Model(object):
         template_file_path = "%s/tasks/services/%s.yml" % (self._builder.template_dir, self.name)
         with open(template_file_path, 'r') as f:
             template = Template(f.read())
+            kwargs.update(self._builder.project.get_vars())
             kwargs.update(self.get_parameters())
             kwargs.update({
                 '__service_name__': self.service_name,
@@ -99,7 +103,8 @@ class Model(object):
 class LAMPWebsiteModel(Model):
     name = 'lamp_website'
     defaults = {
-        'mysql_user_name': lambda model: model.service_slug
+        'mysql_user_name': lambda model: model.service_slug,
+        'mysql_database': lambda model: model.service_slug,
     }
 
     @property
@@ -187,14 +192,14 @@ class Builder(object):
         self._copy_files(from_dir, to_dir, group_tasks)
 
     def build_project_vars(self):
-        self._output("vars.yml", yaml.dump(self._project.vars, default_flow_style=False, indent=4))
+        self._output("vars.yml", yaml.safe_dump(self._project.vars, default_flow_style=False, indent=4))
 
     def build_hosts_tasks(self, services):
         pass
 
     def build_services_tasks(self, services):
         for task_name, task in services.get_tasks():
-            self._output("services/%s.yml" % task_name, yaml.dump(task, default_flow_style=False, indent=4))
+            self._output("tasks/services/%s.yml" % task_name, task)
 
     @staticmethod
     def _copy_files(from_dir, to_dir, files):
