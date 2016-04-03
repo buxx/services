@@ -7,11 +7,19 @@ hosts:
   127.0.0.1:
     groups:
       - backup
+vars:
+  MYSQL_USER_ROOT_PASSWORD: PASSWORD
+  PMA_PASSWORD: PASSWORD
+  PMA_HTACCESS_LOGIN: root
+  PMA_HTACCESS_PASSWORD: PASSWORD
+  FAIL2BAN_EMAIL: sevajol.bastien@gmail.com
+  FAIL2BAN_SENDER: fail2ban@127.0.0.1
 services:
   - name: pdalzotto.fr
     models:
       - lamp_website
       - backuped
     vars:
-      - MYSQL_PASSWORD: xxxx
+      # - MYSQL_USER: pdalzotto.fr # sous entendu
+      - MYSQL_PASSWORD: xxxx # nom de var ? ne doit exister que pour le service
     host: 172.17.0.3

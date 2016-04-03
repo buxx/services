@@ -58,22 +58,37 @@ class Builder(object):
     def build(self):
         self.build_hosts()
         self.build_hosts_tasks()
+        self.build_hosts_playbooks()
 
     def build_hosts(self):
         hosts = self.get_hosts_build(self._project.get_hosts())
         self._output('hosts', hosts)
 
     def build_hosts_tasks(self):
-        output_dir = "%s/tasks/group" % self._build_dir
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
+        from_dir = "%s/tasks/groups" % self._templates_dir
+        to_dir = "%s/tasks/groups" % self._build_dir
+        group_tasks = self._project.get_hosts_groups()
 
-        for group in self._project.get_hosts_groups():
-            group_tasks_file = "%s/tasks/groups/%s.yml" % (self._templates_dir, group)
-            if not os.path.exists(group_tasks_file):
-                raise Exception("Host group tasks file not found: \"%s\"" % group_tasks_file)
+        self._copy_files(from_dir, to_dir, group_tasks)
 
-            shutil.copyfile(group_tasks_file, "%s/%s.yml" % (output_dir, group))
+    def build_hosts_playbooks(self):
+        from_dir = "%s/playbooks/groups" % self._templates_dir
+        to_dir = "%s/playbooks/groups" % self._build_dir
+        group_tasks = self._project.get_hosts_groups()
+
+        self._copy_files(from_dir, to_dir, group_tasks)
+
+    @staticmethod
+    def _copy_files(from_dir, to_dir, files):
+        if not os.path.exists(to_dir):
+            os.makedirs(to_dir)
+
+        for file_name in files:
+            from_file_path =  "%s/%s.yml" % (from_dir, file_name)
+            if not os.path.exists(from_file_path):
+                raise Exception("File not found: \"%s\"" % from_file_path)
+
+            shutil.copyfile(from_file_path, "%s/%s.yml" % (to_dir, file_name))
 
     def _output(self, file_path, content):
         if not os.path.exists(self._build_dir):
