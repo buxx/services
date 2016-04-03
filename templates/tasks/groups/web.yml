@@ -1,0 +1,19 @@
+- name: neuro debian repo (for last fail2ban) 1/2
+  apt_repository: repo='deb http://neurodebian.ovgu.de/debian data main' state=present
+
+- name: neuro debian repo (for last fail2ban) 2/2
+  apt_repository: repo='deb http://neurodebian.ovgu.de/debian jessie main' state=present
+
+- name: neuro debian repo public key
+  apt_key: keyserver=hkp://pgp.mit.edu:80 id=0xA5D32F012649A5A9
+
+- name: packages installed
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=0
+  with_items:
+    - fail2ban
+
+- name: fail2ban jail.local
+  template: src=../src/web/jail.local dest=/etc/fail2ban/jail.local mode=0664
+
+- name: fail2ban reloaded
+  service: name=fail2ban state=reloaded

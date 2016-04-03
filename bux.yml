@@ -1,0 +1,17 @@
+name: bux
+hosts:
+  172.17.0.3:
+    groups:
+      - web
+      - lamp
+  127.0.0.1:
+    groups:
+      - backup
+services:
+  - name: pdalzotto.fr
+    models:
+      - lamp_website
+      - backuped
+    vars:
+      - MYSQL_PASSWORD: xxxx
+    host: 172.17.0.3

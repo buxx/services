@@ -1,3 +1,4 @@
 ansible
 markupsafe
 jinja2
+PyYAML
