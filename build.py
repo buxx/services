@@ -57,8 +57,11 @@ class Builder(object):
 
     def build(self):
         self.build_hosts()
+        self.build_project_vars()
         self.build_hosts_tasks()
         self.build_hosts_playbooks()
+        # self.build_services_tasks()
+        # self.build_services_playbooks()
 
     def build_hosts(self):
         hosts = self.get_hosts_build(self._project.get_hosts())
@@ -77,6 +80,9 @@ class Builder(object):
         group_tasks = self._project.get_hosts_groups()
 
         self._copy_files(from_dir, to_dir, group_tasks)
+
+    def build_project_vars(self):
+        self._output("vars.yml", yaml.dump(self._project.vars, default_flow_style=False, indent=4))
 
     @staticmethod
     def _copy_files(from_dir, to_dir, files):
