@@ -107,14 +107,6 @@ class LAMPWebsiteModel(Model):
         'mysql_database': lambda model: model.service_slug,
     }
 
-    @property
-    def mysql_user_name(self):
-        return self.service_name
-
-    @property
-    def mysql_password(self):
-        return self.get_parameter('mysql_password')
-
 
 class Models(object):
     _models = {
