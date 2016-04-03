@@ -23,7 +23,10 @@ services:
   - name: pdalzotto.fr
     models:
       - lamp_website # vhost apache, mysql db
-      - lamp_website_backuped #
+      # - lamp_website_backuped #
+    parameters:
+      lamp_website:
+        mysql_password: xxxx
     vars:
       # - MYSQL_USER: pdalzotto.fr # sous entendu
       - MYSQL_PASSWORD: xxxx # nom de var ? ne doit exister que pour le service

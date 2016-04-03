@@ -1,0 +1,14 @@
+- name: ({{ __service_name__ }}) {{ __service_name__ }} mysql user privilege
+  mysql_user:
+    name: {{ __service_name__ }}
+    host: "{{ item }}"
+    password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
+    login_user: root
+    login_password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
+    check_implicit_admin: yes
+    priv: "*.*:ALL,GRANT"
+  with_items:
+    - "{{ inventory_hostname }}"
+    - 127.0.0.1
+    - ::1
+    - localhost

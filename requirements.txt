@@ -2,3 +2,4 @@ ansible
 markupsafe
 jinja2
 PyYAML
+python-slugify
