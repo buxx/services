@@ -48,6 +48,11 @@ class Loader(object):
             return Project(name, description)
 
 
+class Services(object):
+    def __init__(self, project):
+        self._project = project
+
+
 class Builder(object):
     def __init__(self, project, output, templates_dir='./templates'):
         self._project = project
@@ -58,14 +63,18 @@ class Builder(object):
     def build(self):
         self.build_hosts()
         self.build_project_vars()
-        self.build_hosts_tasks()
-        # self.build_services_tasks()
+        services = self.get_services()
+        self.build_hosts_tasks(services)
+        self.build_services_tasks(services)
 
     def build_hosts(self):
         hosts = self.get_hosts_build(self._project.get_hosts())
         self._output('hosts', hosts)
 
-    def build_hosts_tasks(self):
+    def get_services(self):
+        return Services(self._project)
+
+    def build_hosts_tasks(self, services):
         from_dir = "%s/tasks/groups" % self._templates_dir
         to_dir = "%s/tasks/groups" % self._build_dir
         group_tasks = self._project.get_hosts_groups()
@@ -80,6 +89,9 @@ class Builder(object):
 
     def build_project_vars(self):
         self._output("vars.yml", yaml.dump(self._project.vars, default_flow_style=False, indent=4))
+
+    def build_services_tasks(self, services):
+        pass
 
     @staticmethod
     def _copy_files(from_dir, to_dir, files):
