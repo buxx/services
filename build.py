@@ -59,9 +59,7 @@ class Builder(object):
         self.build_hosts()
         self.build_project_vars()
         self.build_hosts_tasks()
-        self.build_hosts_playbooks()
         # self.build_services_tasks()
-        # self.build_services_playbooks()
 
     def build_hosts(self):
         hosts = self.get_hosts_build(self._project.get_hosts())
@@ -74,7 +72,6 @@ class Builder(object):
 
         self._copy_files(from_dir, to_dir, group_tasks)
 
-    def build_hosts_playbooks(self):
         from_dir = "%s/playbooks/groups" % self._templates_dir
         to_dir = "%s/playbooks/groups" % self._build_dir
         group_tasks = self._project.get_hosts_groups()
