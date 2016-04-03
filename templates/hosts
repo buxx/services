@@ -1,0 +1,8 @@
+{% for group in groups -%}
+[{{ group }}]
+{% for host in hosts -%}
+{% if group in host.groups -%}
+{{ host.name }}
+{% endif -%}
+{% endfor %}
+{% endfor -%}
