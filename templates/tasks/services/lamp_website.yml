@@ -1,4 +1,4 @@
-- name: ({{ __service_name__ }}) {{ __service_name__ }} mysql user privilege
+- name: ({{ __model_name__ }}) {{ __service_name__ }} mysql user privilege
   mysql_user:
     name: {{ __service_name__ }}
     host: "{{ "{{ item }}" }}"

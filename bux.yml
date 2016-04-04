@@ -19,15 +19,16 @@ models: # Les models doivent etre charge au debut et influencer les tasks, etc (
     - ssh_user_name: backup
     - ssh_user_private_key: keys/id_rsa_backup
     - backup_dir: /backups
+parameters:
+  lamp_website_backup:
+    - backup_group: backup
 services:
   - name: pdalzotto.fr
     models:
       - lamp_website # vhost apache, mysql db
-      # - lamp_website_backuped #
+      - lamp_website_backup
     parameters:
       lamp_website:
         mysql_password: xxxx
-    vars:
-      # - MYSQL_USER: pdalzotto.fr # sous entendu
-      - MYSQL_PASSWORD: xxxx # nom de var ? ne doit exister que pour le service
-    host: 172.17.0.3
+    hosts:
+      - 172.17.0.3
