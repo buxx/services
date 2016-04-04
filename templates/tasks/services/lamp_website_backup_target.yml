@@ -1,2 +1,7 @@
 - name: ({{ __model_name__ }}) {{ __service_name__ }} backup user
   user: name=backup comment="Backup user"
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }} authorized_keys for backup user
+  authorized_key: user=backup key="{{ item }}"
+  with_file:
+    - ../../../../keys/id_rsa_backup.pub  # TODO: parameter

@@ -276,11 +276,11 @@ class Builder(object):
             for task_file in tasks_files:
                 tasks.append({'include': "../../%s" % task_file})
 
-            host_playbook = {
+            host_playbook = [{
                 'hosts': host_name,
                 # TODO: vars du playbook ?
                 'tasks': tasks
-            }
+            }]
             self._output("playbooks/hosts/%s.yml" % host_name,
                          yaml.safe_dump(host_playbook, default_flow_style=False, indent=4))
 

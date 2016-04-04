@@ -1,0 +1,13 @@
+- name: backup packages
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - rsync
+
+- name: backup user
+  user: name=backup comment="Backup user"
+
+- name: backup user key
+  copy: src={{ item }} dest=/home/backup/.ssh/  mode=0600  # TODO: parameter
+  with_items:
+    - ../../../../keys/id_rsa_backup  # TODO: parameter + copy into builds
+    - ../../../../keys/id_rsa_backup.pub  # TODO: parameter + copy into builds

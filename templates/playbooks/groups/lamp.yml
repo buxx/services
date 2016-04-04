@@ -3,6 +3,6 @@
   vars: 
     - FAIL2BAN_APACHE: True
   tasks:
-    - include_vars: ../vars.yml
+    - include_vars: ../../vars.yml
     - include: ../tasks/groups/web.yml
     - include: ../tasks/groups/lamp.yml

@@ -12,8 +12,8 @@
   with_items:
     - fail2ban
 
-- name: fail2ban jail.local
-  template: src=../src/web/jail.local dest=/etc/fail2ban/jail.local mode=0664
+#- name: fail2ban jail.local
+#  template: src=../src/web/jail.local dest=/etc/fail2ban/jail.local mode=0664
 
 - name: fail2ban reloaded
   service: name=fail2ban state=reloaded

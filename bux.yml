@@ -29,6 +29,6 @@ services:
       - lamp_website_backup
     parameters:
       lamp_website:
-        mysql_password: xxxx
+        mysql_user_password: xxxx
     hosts:
       - 172.17.0.3

@@ -1,10 +1,10 @@
 - name: ({{ __model_name__ }}) {{ __service_name__ }} mysql user privilege
   mysql_user:
-    name: {{ __service_name__ }}
+    name: {{ mysql_user_name }}
     host: "{{ "{{ item }}" }}"
-    password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
-    login_user: {{ mysql_user_name }}
-    login_password: "{{ mysql_user_password }}"
+    password: "{{ mysql_user_password }}"
+    login_user: root
+    login_password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
     check_implicit_admin: yes
     priv: "{{ mysql_database }}.*:ALL,GRANT"
   with_items:
