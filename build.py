@@ -261,10 +261,22 @@ class Builder(object):
         self._output("vars.yml", yaml.safe_dump(self._project.vars, default_flow_style=False, indent=4))
 
     def build_hosts_tasks(self, services):
+        hosts_tasks = {}
         for host_name in services.get_hosts():
+            hosts_tasks[host_name] = []
             for task_name, task in services.get_tasks_for_host(host_name):
                 task_file_path = "tasks/services/%s_%s.yml" % (host_name, task_name)
                 self._output(task_file_path, task)
+                hosts_tasks[host_name].append(task_file_path)
+
+        for host_name, tasks_files in hosts_tasks.items():
+            tasks = []
+            for group_name in self._project.hosts[host_name]['groups']:
+                tasks.append({'include': "../groups/%s.yml" % group_name})
+            for task_file in tasks_files:
+                tasks.append({'include': "../../%s" % task_file})
+            self._output("tasks/hosts/%s.yml" % host_name,
+                         yaml.safe_dump(tasks, default_flow_style=False, indent=4))
 
     # def build_services_tasks(self, services):
     #     for task_name, task in services.get_tasks():
