@@ -272,11 +272,17 @@ class Builder(object):
         for host_name, tasks_files in hosts_tasks.items():
             tasks = []
             for group_name in self._project.hosts[host_name]['groups']:
-                tasks.append({'include': "../groups/%s.yml" % group_name})
+                tasks.append({'include': "../../tasks/groups/%s.yml" % group_name})
             for task_file in tasks_files:
                 tasks.append({'include': "../../%s" % task_file})
-            self._output("tasks/hosts/%s.yml" % host_name,
-                         yaml.safe_dump(tasks, default_flow_style=False, indent=4))
+
+            host_playbook = {
+                'hosts': host_name,
+                # TODO: vars du playbook ?
+                'tasks': tasks
+            }
+            self._output("playbooks/hosts/%s.yml" % host_name,
+                         yaml.safe_dump(host_playbook, default_flow_style=False, indent=4))
 
     # def build_services_tasks(self, services):
     #     for task_name, task in services.get_tasks():

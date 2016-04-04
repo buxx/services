@@ -1,6 +1,5 @@
 *~
 *.retry
 .idea
-hosts
 builds
 DEADJOE
