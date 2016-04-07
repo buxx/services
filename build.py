@@ -73,6 +73,7 @@ class NoTaskForHostException(Exception):
 class Model(object):
     name = NotImplemented
     defaults = {}
+    files = {}
 
     def __init__(self, builder, service):
         self._builder = builder
@@ -96,29 +97,51 @@ class Model(object):
                 parameters[default_parameter] = self.defaults[default_parameter](self)
         return parameters
 
-    def render(self, job=None, **kwargs):
+    def render_job(self, job=None, **kwargs):
         job_name = "%s.yml" % self.name
         if job is not None:
             job_name = "%s_%s.yml" % (self.name, job)
 
-        template_file_path = "%s/tasks/services/%s" % (self._builder.template_dir, job_name)
+        template_file_path = "tasks/services/%s" % job_name
+        return self.render(template_file_path, **kwargs)
+
+    def render_file(self, file_path, **kwargs):
+        template_file_path = "files/%s/%s" % (self.name, file_path)
+        return self.render(template_file_path, **kwargs)
+
+    def render(self, file_path, **kwargs):
+        template_file_path = "%s/%s" % (self._builder.template_dir, file_path)
         with open(template_file_path, 'r') as f:
             template = Template(f.read())
-            kwargs.update(self._builder.project.get_vars())
-            kwargs.update(self.get_parameters())
-            kwargs.update({
-                '__service_name__': self.service_name,
-                '__model_name__': self.name
-            })
+            kwargs.update(self._get_template_parameters())
             return template.render(**kwargs)
+
+    def _get_template_parameters(self):
+        parameters = {}
+        parameters.update(self._builder.project.get_vars())
+        parameters.update(self.get_parameters())
+        parameters.update({
+            '__service_name__': self.service_name,
+            '__model_name__': self.name
+        })
+        return parameters
 
     def get_task_for_host(self, host_name):
         if host_name in self._service['hosts']:
-            return self.render()
+            return self.render_job()
         raise NoTaskForHostException()
 
     def get_concerned_hosts(self):
         return self._service['hosts']
+
+    def get_files(self):
+        files = []
+        for source, dest in self.files.items():
+            template = Template(dest)
+            destt = template.render(self._get_template_parameters())
+            content = self.render_file(source)
+            files.append(('{0}/{1}'.format(self.name, destt), content))
+        return files
 
 
 class LAMPWebsiteModel(Model):
@@ -126,7 +149,10 @@ class LAMPWebsiteModel(Model):
     defaults = {
         'mysql_user_name': lambda model: model.service_slug,
         'mysql_database': lambda model: model.service_slug,
+        'sub_domain': lambda model: 'www',
+        'www_server_alias': lambda model: True
     }
+    files = {'virtualhost.conf': '{{ domain }}.conf'}
 
 
 class LAMPWebsiteBackupModel(Model):
@@ -134,10 +160,10 @@ class LAMPWebsiteBackupModel(Model):
 
     def get_task_for_host(self, host_name):
         if host_name in self._service['hosts']:
-            return self.render('target')
+            return self.render_job('target')
 
         if host_name in self.get_concerned_hosts():
-            return self.render('repository')
+            return self.render_job('repository')
 
         raise Exception("Where do you do ehre ?")
 
@@ -183,6 +209,14 @@ class Services(object):
                 except NoTaskForHostException:
                     pass
         return tasks
+
+    def get_services_files(self):
+        files = []
+        for service in self._project.services:
+            for model_name in service['models']:
+                model = Models.get(model_name, service, builder=self._builder)
+                files.extend(model.get_files())
+        return files
 
     def get_services_for_host(self, host_name):
         services = []
@@ -235,6 +269,7 @@ class Builder(object):
         self.build_groups_tasks()
         services = self.get_services()
         # self.build_services_tasks(services)
+        self.build_services_files(services)
         self.build_hosts_tasks(services)
 
     def build_hosts(self):
@@ -259,6 +294,11 @@ class Builder(object):
 
     def build_project_vars(self):
         self._output("vars.yml", yaml.safe_dump(self._project.vars, default_flow_style=False, indent=4))
+
+    def build_services_files(self, services):
+        for file_path, file_content in services.get_services_files():
+            file_path = "files/{0}".format(file_path)
+            self._output(file_path, file_content)
 
     def build_hosts_tasks(self, services):
         hosts_tasks = {}

@@ -12,3 +12,15 @@
     - 127.0.0.1
     - ::1
     - localhost
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }} source directory
+  file: path=/srv/sites/{{ domain }}/www state=directory owner=www-data group=www-data mode=0775 recurse=yes
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }}  vhost
+  copy: src=../../../files/lamp_website/{{ domain }}/{{ domain }}.conf dest=/etc/apache2/sites-available/{{ domain }}.conf mode=0644
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }}  vhost enabled
+  file: src=/etc/apache2/sites-available/{{ domain }}.conf dest=/etc/apache2/sites-enabled/{{ domain }}.conf state=link
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }} apache reloaded
+  service: name=apache2 state=reloaded

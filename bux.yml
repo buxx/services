@@ -30,5 +30,6 @@ services:
     parameters:
       lamp_website:
         mysql_user_password: xxxx
+        domain: pdalzotto.fr
     hosts:
       - 172.17.0.3
