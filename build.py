@@ -95,6 +95,7 @@ class Model(object):
         for default_parameter in self.defaults:
             if default_parameter not in parameters:
                 parameters[default_parameter] = self.defaults[default_parameter](self)
+        parameters.update(self.get_magics_parameters())
         return parameters
 
     def render_job(self, job=None, **kwargs):
@@ -120,11 +121,14 @@ class Model(object):
         parameters = {}
         parameters.update(self._builder.project.get_vars())
         parameters.update(self.get_parameters())
-        parameters.update({
-            '__service_name__': self.service_name,
-            '__model_name__': self.name
-        })
         return parameters
+
+    def get_magics_parameters(self):
+        return {
+            '__service_name__': self.service_name,
+            '__service_name_slug__': slugify(self.service_name),
+            '__model_name__': self.name
+        }
 
     def get_task_for_host(self, host_name):
         if host_name in self._service['hosts']:
@@ -140,7 +144,7 @@ class Model(object):
             template = Template(dest)
             destt = template.render(self._get_template_parameters())
             content = self.render_file(source)
-            files.append(('{0}/{1}'.format(self.name, destt), content))
+            files.append(('{0}/{1}/{2}'.format(self.name, self.get_parameter('__service_name_slug__'), destt), content))
         return files
 
 
