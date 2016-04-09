@@ -107,7 +107,7 @@ class Model(object):
         return self.render(template_file_path, **kwargs)
 
     def render_file(self, file_path, **kwargs):
-        template_file_path = "files/%s/%s" % (self.name, file_path)
+        template_file_path = "files/services/%s/%s" % (self.name, file_path)
         return self.render(template_file_path, **kwargs)
 
     def render(self, file_path, **kwargs):
@@ -271,6 +271,7 @@ class Builder(object):
         self.build_hosts()
         self.build_project_vars()
         self.build_groups_tasks()
+        self.build_groups_files()
         services = self.get_services()
         # self.build_services_tasks(services)
         self.build_services_files(services)
@@ -299,9 +300,15 @@ class Builder(object):
     def build_project_vars(self):
         self._output("vars.yml", yaml.safe_dump(self._project.vars, default_flow_style=False, indent=4))
 
+    def build_groups_files(self):
+        for group_name in self._project.get_hosts_groups():
+            group_files = '{0}/files/groups/{1}'.format(self._templates_dir, group_name)
+            if os.path.isdir(group_files):
+                shutil.copytree(group_files, '{0}/files/groups/{1}/'.format(self._build_dir, group_name))
+
     def build_services_files(self, services):
         for file_path, file_content in services.get_services_files():
-            file_path = "files/{0}".format(file_path)
+            file_path = "files/services/{0}".format(file_path)
             self._output(file_path, file_content)
 
     def build_hosts_tasks(self, services):

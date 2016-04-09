@@ -17,7 +17,7 @@
   file: path=/srv/sites/{{ domain }}/www state=directory owner=www-data group=www-data mode=0775 recurse=yes
 
 - name: ({{ __model_name__ }}) {{ __service_name__ }}  vhost
-  copy: src=../../files/lamp_website/{{ __service_name_slug__ }}/{{ domain }}.conf dest=/etc/apache2/sites-available/{{ domain }}.conf mode=0644
+  copy: src=../../files/services/lamp_website/{{ __service_name_slug__ }}/{{ domain }}.conf dest=/etc/apache2/sites-available/{{ domain }}.conf mode=0644
 
 - name: ({{ __model_name__ }}) {{ __service_name__ }}  vhost enabled
   file: src=/etc/apache2/sites-available/{{ domain }}.conf dest=/etc/apache2/sites-enabled/{{ domain }}.conf state=link

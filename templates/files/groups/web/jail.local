@@ -1,0 +1,4 @@
+[DEFAULT]
+destemail = {{ FAIL2BAN_EMAIL }}
+sender = {{ FAIL2BAN_SENDER }}
+maxretry = 3
