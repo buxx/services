@@ -304,7 +304,10 @@ class Builder(object):
         for group_name in self._project.get_hosts_groups():
             group_files = '{0}/files/groups/{1}'.format(self._templates_dir, group_name)
             if os.path.isdir(group_files):
-                shutil.copytree(group_files, '{0}/files/groups/{1}/'.format(self._build_dir, group_name))
+                target_dir = '{0}/files/groups/{1}/'.format(self._build_dir, group_name)
+                if os.path.exists(target_dir):
+                    shutil.rmtree(target_dir)
+                shutil.copytree(group_files, target_dir)
 
     def build_services_files(self, services):
         for file_path, file_content in services.get_services_files():
