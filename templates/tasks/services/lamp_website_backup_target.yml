@@ -1,7 +1,15 @@
 - name: ({{ __model_name__ }}) {{ __service_name__ }} backup user
-  user: name=backup comment="Backup user"
+  user: name=backup comment="Backup user" shell=/bin/bash home=/home/backup
+
+- name: Prevent ssh password login of backup user
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK (backup user) -->"
+    content: |
+      Match user backup
+        PasswordAuthentication no
 
 - name: ({{ __model_name__ }}) {{ __service_name__ }} authorized_keys for backup user
-  authorized_key: user=backup key="{{ item }}"
+  authorized_key: user=backup key="{{ '{{ item }}' }}"
   with_file:
     - ../../../../keys/id_rsa_backup.pub  # TODO: parameter

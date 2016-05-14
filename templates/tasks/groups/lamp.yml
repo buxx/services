@@ -45,9 +45,6 @@
 - name: debconf for pma
   debconf: name=phpmyadmin question='phpmyadmin/reconfigure-webserver' value='' vtype='multiselect'
 
-- name: Hello World PHP script
-  copy: src=../../../../src/web/index.php dest=/var/www/index.php mode=0664
-
 - name: pma virtual host
   # TODO: copy files, etc
   copy: src=../../../../src/web/phpmyadmin.conf dest=/etc/apache2/sites-available/phpmyadmin.conf mode=0664

@@ -1,7 +1,6 @@
-- name: ({{ __model_name__ }}) {{ __service_name__ }} cron job
-  cron:
-    - user="backup"
-    - name="backup {{ __service_name__ }}"
-    - minute="0"
-    - hour="1"
-    - job="echo backuping ..."
+- cron:
+    name="backup {{ __service_name__ }}"
+    user="backup"
+    minute="0"
+    hour="1"
+    job="echo backuping ..."

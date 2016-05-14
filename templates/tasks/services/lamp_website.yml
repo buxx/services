@@ -14,7 +14,7 @@
     - localhost
 
 - name: ({{ __model_name__ }}) {{ __service_name__ }} source directory
-  file: path=/srv/sites/{{ domain }}/www state=directory owner=www-data group=www-data mode=0775 recurse=yes
+  file: path=/srv/www/{{ domain }}/www state=directory owner=www-data group=www-data mode=0775 recurse=yes
 
 - name: ({{ __model_name__ }}) {{ __service_name__ }}  vhost
   copy: src=../../files/services/lamp_website/{{ __service_name_slug__ }}/{{ domain }}.conf dest=/etc/apache2/sites-available/{{ domain }}.conf mode=0644

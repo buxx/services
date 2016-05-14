@@ -4,10 +4,18 @@
     - rsync
 
 - name: backup user
-  user: name=backup comment="Backup user"
+  user: name=backup comment="Backup user" shell=/bin/bash home=/home/backup
 
 - name: backup user key
-  copy: src={{ item }} dest=/home/backup/.ssh/  mode=0600  # TODO: parameter
-  with_items:
-    - ../../../../keys/id_rsa_backup  # TODO: parameter + copy into builds
-    - ../../../../keys/id_rsa_backup.pub  # TODO: parameter + copy into builds
+  copy: src=../../../../keys/id_rsa_backup dest=/home/backup/.ssh/id_rsa mode=0600 owner=backup # TODO: parameter + copy into builds
+
+- name: backup user key
+  copy: src=../../../../keys/id_rsa_backup.pub dest=/home/backup/.ssh/id_rsa.pub mode=0600 owner=backup # TODO: parameter + copy into builds
+
+- name: Prevent ssh password login of backup user
+  blockinfile:
+    dest: /etc/ssh/sshd_config
+    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK (backup user) -->"
+    content: |
+      Match user backup
+        PasswordAuthentication no

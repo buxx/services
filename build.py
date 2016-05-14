@@ -333,7 +333,8 @@ class Builder(object):
             host_playbook = [{
                 'hosts': host_name,
                 # TODO: vars du playbook ?
-                'tasks': tasks
+                'tasks': tasks,
+                'vars': self._project.vars
             }]
             self._output("playbooks/hosts/%s.yml" % host_name,
                          yaml.safe_dump(host_playbook, default_flow_style=False, indent=4))
