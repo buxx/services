@@ -175,10 +175,28 @@ class LAMPWebsiteBackupModel(Model):
         return self._builder.project.get_hosts_in_group('backup')  # TODO: project parameter
 
 
+class UWSGIWebsiteModel(Model):
+    name = 'uwsgi_website'
+    defaults = {
+        'db_user_name': lambda model: model.service_slug,
+        'db_database': lambda model: model.service_slug,
+        'sub_domain': lambda model: 'www',
+        'www_server_alias': lambda model: True,
+        'plugin': lambda model: 'python3',
+        'module': lambda model: 'wsgi',
+        'callable': lambda model: 'app',
+    }
+    files = {
+        'site.ini': '{{ sub_domain }}.{{ domain }}.ini',
+        'apache2_proxy.conf': '{{ sub_domain }}.{{ domain }}.conf',
+    }
+
+
 class Models(object):
     _models = {
         LAMPWebsiteModel.name: LAMPWebsiteModel,
         LAMPWebsiteBackupModel.name: LAMPWebsiteBackupModel,
+        UWSGIWebsiteModel.name: UWSGIWebsiteModel,
     }
 
     @classmethod

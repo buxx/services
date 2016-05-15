@@ -1,0 +1,54 @@
+# TODO: Choix de la base de donnee
+- name: ({{ __model_name__ }}) {{ __service_name__ }} postgres database
+  become_user: postgres
+  postgresql_db:
+    name={{ db_database }}
+
+# ALL databases or ALL on database ??
+- name: ({{ __model_name__ }}) {{ __service_name__ }} postgres user privilege
+  become_user: postgres
+  postgresql_user:
+    db={{ db_database }}
+    name={{ db_database }}
+    password="{{ db_password }}"
+    priv=ALL
+
+# TODO: Si python3 module actif
+- name: uwsgi packages installed
+  apt: name={{ '{{ item }}' }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - uwsgi-plugin-python3
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }} source directory
+  file: path=/srv/www/{{ domain }}/{{ sub_domain }} state=directory owner=www-data group=www-data mode=0775 recurse=yes
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }}  uwsgi conf
+  copy: src=../../files/services/uwsgi_website/{{ __service_name_slug__ }}/{{ sub_domain }}.{{ domain }}.ini dest=/etc/uwsgi/apps-available/{{ sub_domain }}.{{ domain }}.ini mode=0644
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }}  vhost enabled
+  file: src=/etc/uwsgi/apps-available/{{ sub_domain }}.{{ domain }}.ini dest=/etc/uwsgi/apps-enabled/{{ sub_domain }}.{{ domain }}.ini state=link
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }} uwsgi reloaded
+  service: name=uwsgi state=reloaded
+
+{% if proxy == 'apache2' %}
+
+- name: libapache2-mod-uwsgi packages installed
+  apt: name={{ '{{ item }}' }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - libapache2-mod-uwsgi
+
+- name: apache uwsgi mod enabled
+- apache2_module:
+  state=present
+  name=uwsgi
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }}  proxy vhost
+  copy: src=../../files/services/uwsgi_website/{{ __service_name_slug__ }}/{{ sub_domain }}.{{ domain }}.conf dest=/etc/apache2/sites-available/{{ sub_domain }}.{{ domain }}.conf mode=0644
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }}  proxy vhost enabled
+  file: src=/etc/apache2/sites-available/{{ sub_domain }}.{{ domain }}.conf dest=/etc/apache2/sites-enabled/{{ sub_domain }}.{{ domain }}.conf state=link
+
+- name: ({{ __model_name__ }}) {{ __service_name__ }} apache reloaded
+  service: name=apache2 state=reloaded
+{% endif %}

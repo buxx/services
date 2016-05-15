@@ -1,0 +1,15 @@
+- include_vars: ../../vars.yml
+- name: uwsgi packages installed
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - uwsgi
+    # TODO: ailleurs ?
+    - postgresql
+    - python-psycopg2
+
+- name: uwsgi services up
+  service: name={{ item }} state=running enabled=yes
+  with_items:
+    - uwsgi
+    # TODO: ailleurs ?
+    - postgresql

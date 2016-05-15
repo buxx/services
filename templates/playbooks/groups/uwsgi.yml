@@ -1,0 +1,8 @@
+---
+- hosts: uwsgi
+  vars: 
+    - FAIL2BAN_UWSGI: True # TODO
+  tasks:
+    - include_vars: ../../vars.yml
+    - include: ../tasks/groups/web.yml
+    - include: ../tasks/groups/uwsgi.yml
