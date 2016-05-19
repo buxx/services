@@ -1,3 +1,10 @@
+- name: ({{ __model_name__ }}) {{ __service_name__ }} mysql database
+  mysql_db:
+    name: {{ mysql_database }}
+    state: present
+    login_user: root
+    login_password: "{{ MYSQL_USER_ROOT_PASSWORD }}"
+
 - name: ({{ __model_name__ }}) {{ __service_name__ }} mysql user privilege
   mysql_user:
     name: {{ mysql_user_name }}

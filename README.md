@@ -37,3 +37,5 @@ Run playbook on it
 ```
 ansible-playbook -i hosts --private-key docker/sandbox/debian/id_rsa_ansible -u ansible --sudo playbooks/lamp.yml
 ```
+
+TODO: Template file instead generated files
