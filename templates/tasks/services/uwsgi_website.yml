@@ -39,9 +39,9 @@
     - libapache2-mod-uwsgi
 
 - name: apache uwsgi mod enabled
-- apache2_module:
-  state=present
-  name=uwsgi
+  apache2_module:
+    state: present
+    name: uwsgi
 
 - name: ({{ __model_name__ }}) {{ __service_name__ }}  proxy vhost
   copy: src=../../files/services/uwsgi_website/{{ __service_name_slug__ }}/{{ sub_domain }}.{{ domain }}.conf dest=/etc/apache2/sites-available/{{ sub_domain }}.{{ domain }}.conf mode=0644

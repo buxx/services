@@ -1,6 +1,24 @@
+# TODO: generic template
+# TODO: mode executable ?
+- name: backup database script file
+  vars:
+    ssh_user: backup
+    ssh_host: {{ service_host }}
+    db_user: {{ backup_mysql_user_name }}
+    db_password: {{ backup_mysql_user_password }}
+    db_name: {{ backup_mysql_database }}
+    dump_dir: {{ backup_dir }}/db/
+    dump_suffix: {{ dump_suffix }}
+  template:
+    src: ../../files/services/lamp_website_backup/{{ __service_name_slug__ }}/backup_db.sh
+    dest: /home/backup/scripts/backup_db_{{ __service_name_slug__ }}.sh
+    owner: backup
+    mode: 0600
+
+# TODO: frequence
 - cron:
     name="backup {{ __service_name__ }}"
     user="backup"
     minute="0"
     hour="1"
-    job="echo backuping ..."
+    job="bash /home/backup/scripts/backup_db_{{ __service_name_slug__ }}.sh"

@@ -4,7 +4,7 @@
 - name: Prevent ssh password login of backup user
   blockinfile:
     dest: /etc/ssh/sshd_config
-    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK (backup user) -->"
+    marker: "### {mark} ANSIBLE MANAGED BLOCK (backup user) ###"
     content: |
       Match user backup
         PasswordAuthentication no

@@ -15,6 +15,16 @@
     - apache2
     - mysql
 
+- name: apache2-utils packages installed
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - apache2-utils
+
+- name: apache rewrite mod enabled
+  apache2_module:
+    state: present
+    name: rewrite
+
 - name: mysql root privileges
   mysql_user:
     name: root

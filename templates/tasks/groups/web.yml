@@ -18,7 +18,7 @@
 - name: Prevent ssh password login of ansible user
   blockinfile:
     dest: /etc/ssh/sshd_config
-    marker: "<!-- {mark} ANSIBLE MANAGED BLOCK (ansible user) -->"
+    marker: "### {mark} ANSIBLE MANAGED BLOCK (ansible user) ###"
     content: |
       Match user ansible
         PasswordAuthentication no
