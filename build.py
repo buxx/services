@@ -162,14 +162,17 @@ class LAMPWebsiteModel(Model):
 class LAMPWebsiteBackupModel(Model):
     name = 'lamp_website_backup'
     defaults = {
-        'dump_suffix': lambda model: '${date +"%Y-%m-%d-%H-%M-%S"}',
+        'dump_suffix': lambda model: '_$(date +"%Y-%m-%d-%H-%M-%S")',
         'ssh_user': lambda model: 'backup'
     }
-    files = {'backup_db.sh': 'backup_db.sh'}
+    files = {
+        'backup_db.sh': 'backup_db.sh',
+        'backup_files.sh': 'backup_files.sh',
+    }
 
     def get_task_for_host(self, host_name):
         if host_name in self._service['hosts']:
-            return self.render_job('target')
+            return self.render_job('target', backup_hosts=self.get_concerned_hosts())
 
         if host_name in self.get_concerned_hosts():
             return self.render_job('repository')

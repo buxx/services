@@ -1,16 +1,10 @@
-- name: backup packages
-  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
-  with_items:
-    - rsync
+- name: authorized_keys for production root user
+  authorized_key: user=backup key="{{ item }}"
+  with_file:
+    - ../../../../keys/id_rsa_backup.pub  # TODO: parameter
 
 - name: backup user
   user: name=backup comment="Backup user" shell=/bin/bash home=/home/backup
-
-- name: backup user key
-  copy: src=../../../../keys/id_rsa_backup dest=/home/backup/.ssh/id_rsa mode=0600 owner=backup # TODO: parameter + copy into builds
-
-- name: backup user key
-  copy: src=../../../../keys/id_rsa_backup.pub dest=/home/backup/.ssh/id_rsa.pub mode=0600 owner=backup # TODO: parameter + copy into builds
 
 - name: Prevent ssh password login of backup user
   blockinfile:

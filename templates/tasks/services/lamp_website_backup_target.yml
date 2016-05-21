@@ -1,15 +1,61 @@
-- name: ({{ __model_name__ }}) {{ __service_name__ }} backup user
-  user: name=backup comment="Backup user" shell=/bin/bash home=/home/backup
+- name: production server root key (private)
+  copy: src=../../../../keys/id_rsa_backup dest=/root/.ssh/id_rsa_backup mode=0600 owner=root # TODO: parameter + copy into builds
 
-- name: Prevent ssh password login of backup user
-  blockinfile:
-    dest: /etc/ssh/sshd_config
-    marker: "### {mark} ANSIBLE MANAGED BLOCK (backup user) ###"
-    content: |
-      Match user backup
-        PasswordAuthentication no
+- name: production server root key (public)
+  copy: src=../../../../keys/id_rsa_backup.pub dest=/root/.ssh/id_rsa_backup.pub mode=0600 owner=root # TODO: parameter + copy into builds
 
-- name: ({{ __model_name__ }}) {{ __service_name__ }} authorized_keys for backup user
-  authorized_key: user=backup key="{{ '{{ item }}' }}"
-  with_file:
-    - ../../../../keys/id_rsa_backup.pub  # TODO: parameter
+- name: backup packages
+  apt: name={{ '{{ item }}' }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - rsync
+
+{% for backup_host in backup_hosts %}
+- name: Ensures /root/scripts/ dir exists
+  file: path=/root/scripts/ state=directory
+# TODO: generic template
+# TODO: mode executable ?
+- name: backup database script file ({{ backup_host }})
+  vars:
+    ssh_user: backup
+    backup_host: {{ backup_host }}
+    db_user: {{ backup_mysql_user_name }}
+    db_password: {{ backup_mysql_user_password }}
+    db_name: {{ backup_mysql_database }}
+    dump_dir: {{ backup_dir }}/db/
+    dump_suffix: {{ dump_suffix }}
+  template:
+    src: ../../files/services/lamp_website_backup/{{ __service_name_slug__ }}/backup_db.sh
+    dest: /root/scripts/backup_db_{{ __service_name_slug__ }}_to_{{ backup_host }}.sh
+    owner: root
+    mode: 0600
+
+# TODO: LEs path de site depuis parametres
+# TODO: Le path de backup depuis parametres
+- name: backup files script file
+  vars:
+    ssh_user: backup
+    backup_host: {{ backup_host }}
+    source_dir: /srv/www/{{ domain }}/{{ sub_domain }}
+    target_dir: {{ backup_dir }}/files/
+  template:
+    src: ../../files/services/lamp_website_backup/{{ __service_name_slug__ }}/backup_files.sh
+    dest: /root/scripts/backup_files_{{ __service_name_slug__ }}_to_{{ backup_host }}.sh
+    owner: root
+    mode: 0600
+
+# TODO: frequence
+- cron:
+    name="backup db {{ __service_name__ }}"
+    user="root"
+    minute="0"
+    hour="1"
+    job="bash /root/scripts/backup_db_{{ __service_name_slug__ }}_to_{{ backup_host }}.sh"
+
+# TODO: frequence
+- cron:
+    name="backup files {{ __service_name__ }}"
+    user="root"
+    minute="5"
+    hour="1"
+    job="bash /root/scripts/backup_files_{{ __service_name_slug__ }}_to_{{ backup_host }}.sh"
+{% endfor %}
