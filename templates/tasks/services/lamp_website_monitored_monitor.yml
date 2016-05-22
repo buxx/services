@@ -1,0 +1,43 @@
+- name: ansible nagios services file
+  lineinfile:
+    dest: /usr/local/nagios/etc/nagios.cfg
+    line: cfg_file=/usr/local/nagios/etc/objects/ansible.cfg
+
+- name: nagios ansible.cfg file exist
+  file:
+    path: /usr/local/nagios/etc/objects/ansible.cfg
+    owner: root
+    group: nagios
+    mode: 0644
+    state: touch
+
+- name: nagios target service host declared
+  blockinfile:
+    dest: /usr/local/nagios/etc/objects/ansible.cfg
+    marker: "### {mark} ANSIBLE MANAGED BLOCK (target host definition) ###"
+    content: |
+      define host {
+        use generic-host
+        host_name {{ host_name }}
+        alias {{ host_name }} (ansible managed)
+        address {{ target_ip }}
+        max_check_attempts 1
+      }
+
+- name: nagios target service check
+  blockinfile:
+    dest: /usr/local/nagios/etc/objects/ansible.cfg
+    marker: "### {mark} ANSIBLE MANAGED BLOCK (target url check definition) ###"
+    content: |
+      define service{
+        use generic-service
+        host_name {{ host_name }}
+        service_description URL Index check {{ full_domain }}
+        check_command check_url!http://{{ full_domain }}
+      }
+
+# TODO: Check backups ?
+# TODO: Checks standarts CPU etc definis ailleurs
+
+- name: nagios reloaded
+  service: name=nagios state=reloaded

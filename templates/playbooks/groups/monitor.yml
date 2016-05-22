@@ -1,0 +1,5 @@
+---
+- hosts: monitor
+  tasks:
+    - include_vars: ../../vars.yml
+    - include: ../tasks/groups/monitor.yml

@@ -1,0 +1,15 @@
+- include_vars: ../../vars.yml
+- name: moitor packages installed
+  apt: name={{ item }} state=present update_cache=yes cache_valid_time=3600
+  with_items:
+    - nagios-nrpe-plugin
+
+- name: nrpe command available
+  blockinfile:
+    dest: /usr/local/nagios/etc/objects/commands.cfg
+    marker: "### {mark} ANSIBLE MANAGED BLOCK (nrpe command) ###"
+    content: |
+      define command{
+        command_name check_nrpe
+        command_line $USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+      }

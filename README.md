@@ -39,3 +39,5 @@ ansible-playbook -i hosts --private-key docker/sandbox/debian/id_rsa_ansible -u 
 ```
 
 TODO: Template file instead generated files
+TODO: nagios: /usr/local/nagios/etc/nagios.cfg, cfg_file=/usr/local/nagios/etc/objects/bux.cfg
+      /usr/local/nagios/etc/objects/ansible.cfg

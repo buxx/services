@@ -183,6 +183,42 @@ class LAMPWebsiteBackupModel(Model):
         return self._builder.project.get_hosts_in_group('backup')  # TODO: project parameter
 
 
+class LAMPWebsiteMonitoredModel(Model):
+    name = 'lamp_website_monitored'
+    defaults = {}
+    files = {}
+
+    def get_task_for_host(self, host_name):
+        if host_name in self._service['hosts']:
+            return self.render_job('target')
+
+        if host_name in self.get_concerned_hosts():
+            return self.render_job('monitor')
+
+        raise Exception("Where do you do ehre ?")
+
+    def get_concerned_hosts(self):
+        return self._builder.project.get_hosts_in_group('monitor')  # TODO: project parameter
+
+
+class LAMPWebsiteBackupMonitoredModel(Model):
+    name = 'lamp_website_backup_monitored'
+    defaults = {}
+    files = {}
+
+    def get_task_for_host(self, host_name):
+        if host_name in self._service['hosts']:
+            return self.render_job('target')
+
+        if host_name in self.get_concerned_hosts():
+            return self.render_job('monitor', backup_host_name='localhost')  # TODO: auto !!
+
+        raise Exception("Where do you do ehre ?")
+
+    def get_concerned_hosts(self):
+        return self._builder.project.get_hosts_in_group('monitor')  # TODO: project parameter
+
+
 class UWSGIWebsiteModel(Model):
     name = 'uwsgi_website'
     defaults = {
@@ -205,6 +241,8 @@ class Models(object):
         LAMPWebsiteModel.name: LAMPWebsiteModel,
         LAMPWebsiteBackupModel.name: LAMPWebsiteBackupModel,
         UWSGIWebsiteModel.name: UWSGIWebsiteModel,
+        LAMPWebsiteMonitoredModel.name: LAMPWebsiteMonitoredModel,
+        LAMPWebsiteBackupMonitoredModel.name: LAMPWebsiteBackupMonitoredModel,
     }
 
     @classmethod
