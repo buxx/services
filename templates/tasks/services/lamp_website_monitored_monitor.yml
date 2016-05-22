@@ -27,7 +27,7 @@
 - name: nagios target service check
   blockinfile:
     dest: /usr/local/nagios/etc/objects/ansible.cfg
-    marker: "### {mark} ANSIBLE MANAGED BLOCK (target url check definition) ###"
+    marker: "### {mark} ANSIBLE MANAGED BLOCK ({{ __service_name__ }} target url check definition) ###"
     content: |
       define service{
         use generic-service
